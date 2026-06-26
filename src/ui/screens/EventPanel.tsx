@@ -6,7 +6,7 @@ export default function EventPanel({ step }: { step: Step }) {
   const dispatch = useGameStore((s) => s.dispatch)
   const inventory = useGameStore((s) => s.inventory)
   const mapDigits = useGameStore((s) => s.mapDigits)
-  const finaleCode = useGameStore((s) => s.scenario.finaleCode.length)
+  const finaleCodeLength = useGameStore((s) => s.scenario.finaleCode.length)
   const [answer, setAnswer] = useState('')
 
   const e = step.event
@@ -53,7 +53,7 @@ export default function EventPanel({ step }: { step: Step }) {
     <section>
       <p>{e.text}</p>
       <p aria-label="Карта">Цифры с собранной карты: {mapDigits.length ? mapDigits.join(' ') : '— — —'}</p>
-      <input aria-label="Код" maxLength={finaleCode} value={answer} onChange={(ev) => setAnswer(ev.target.value)} />
+      <input aria-label="Код" maxLength={finaleCodeLength} value={answer} onChange={(ev) => setAnswer(ev.target.value)} />
       <button onClick={() => dispatch({ type: 'SUBMIT_CODE', value: answer }, Date.now())}>Открыть замок</button>
     </section>
   )
