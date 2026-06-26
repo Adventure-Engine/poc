@@ -21,9 +21,10 @@ export default function PlayScreen() {
   // Auto arrive/leave from GPS.
   useEffect(() => {
     if (!location || !pos) return
-    const inside = isInside(location.geo, pos)
-    if (inside && state.atLocationId !== location.id) dispatch({ type: 'ARRIVE', locationId: location.id }, Date.now())
-    else if (!inside && state.atLocationId === location.id) dispatch({ type: 'LEAVE' }, Date.now())
+    if (isInside(location.geo, pos) && state.atLocationId !== location.id)
+      dispatch({ type: 'ARRIVE', locationId: location.id }, Date.now())
+    else if (!isInside(location.geo, pos) && state.atLocationId === location.id)
+      dispatch({ type: 'LEAVE' }, Date.now())
   }, [pos, location, dispatch, state.atLocationId])
 
   useEffect(() => {
