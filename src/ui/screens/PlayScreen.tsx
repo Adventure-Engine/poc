@@ -4,6 +4,7 @@ import { useGameStore } from '../../store/gameStore'
 import { currentStep } from '../../engine/reducer'
 import { useGeolocation } from '../../geo/useGeolocation'
 import { isInside, proximityHint } from '../../geo/geofence'
+import { logEvent } from '../../telemetry/log'
 import EventPanel from './EventPanel'
 import Inventory from '../components/Inventory'
 
@@ -48,7 +49,11 @@ export default function PlayScreen() {
         <section>
           <h2>Иди к точке: {location.title}</h2>
           <p>{hint === 'hot' ? 'Горячо!' : hint === 'warm' ? 'Теплее...' : 'Холодно'}</p>
-          <button onClick={() => dispatch({ type: 'ARRIVE', locationId: location.id }, Date.now())}>
+          <button onClick={() => {
+            const at = Date.now()
+            logEvent('fallback_used', at, { locationId: location.id })
+            dispatch({ type: 'ARRIVE', locationId: location.id }, at)
+          }}>
             Я на месте
           </button>
         </section>
