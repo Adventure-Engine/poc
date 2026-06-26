@@ -36,6 +36,12 @@ export default function PlayScreen() {
   const atTarget = !location || state.atLocationId === location.id
   const hint = location && pos ? proximityHint(location.geo, pos) : 'cold'
 
+  const uncollectedDublon = atTarget && location
+    ? state.scenario.dublons.find(
+        (d) => d.locationId === location.id && !state.collectedDublons.includes(d.id)
+      ) ?? null
+    : null
+
   return (
     <main style={{ padding: 24 }}>
       {location && !atTarget && (
@@ -48,6 +54,14 @@ export default function PlayScreen() {
         </section>
       )}
       {atTarget && <EventPanel step={step} />}
+      {uncollectedDublon && (
+        <section style={{ marginTop: 12 }}>
+          <p>{uncollectedDublon.hint}</p>
+          <button onClick={() => dispatch({ type: 'COLLECT_DUBLON', dublonId: uncollectedDublon.id }, Date.now())}>
+            Я нашёл дублон! 🪙
+          </button>
+        </section>
+      )}
       <Inventory />
     </main>
   )

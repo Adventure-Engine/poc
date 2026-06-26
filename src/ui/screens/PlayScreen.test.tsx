@@ -21,3 +21,16 @@ test('"Я на месте" fallback marks arrival and shows the riddle', async (
   await userEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
   expect(screen.getByText(/Сколько больших ветвей/)).toBeInTheDocument()
 })
+
+test('dublon hint button appears at loc_old_oak and collects dub_oak', async () => {
+  const store = useGameStore.getState()
+  store.dispatch({ type: 'ADVANCE_DIALOG' }, 1) // step 0 -> step 1 (s_oak at loc_old_oak)
+  store.dispatch({ type: 'ARRIVE', locationId: 'loc_old_oak' }, 2)
+  render(<HashRouter><PlayScreen /></HashRouter>)
+  // dublon hint should appear
+  expect(screen.getByText(/Загляни в дупло дуба/)).toBeInTheDocument()
+  // click collect button
+  await userEvent.click(screen.getByRole('button', { name: /Я нашёл дублон/ }))
+  // store should have collected dub_oak
+  expect(useGameStore.getState().collectedDublons).toContain('dub_oak')
+})
