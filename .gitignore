@@ -1,6 +1,11 @@
+# Internal planning artifacts — keep out of the public repo
+docs/superpowers/
+docs/Adventure Engine Vision Document.pdf
+.superpowers/
+
+# Node / build
 node_modules/
 dist/
-.superpowers/
-*.local
 coverage/
+*.local
 *.tsbuildinfo
