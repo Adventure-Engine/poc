@@ -18,7 +18,7 @@ function db() {
 export async function saveProgress(state: GameState): Promise<void> {
   const { scenario, ...rest } = state
   void scenario
-  ;(await db()).put(STORE, rest, KEY)
+  await (await db()).put(STORE, rest, KEY)
 }
 
 export async function loadProgress(): Promise<PersistedProgress | null> {
@@ -27,5 +27,5 @@ export async function loadProgress(): Promise<PersistedProgress | null> {
 }
 
 export async function clearProgress(): Promise<void> {
-  ;(await db()).delete(STORE, KEY)
+  await (await db()).delete(STORE, KEY)
 }
