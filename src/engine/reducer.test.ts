@@ -1,7 +1,7 @@
 import { loadScenario } from '../scenario/load'
 import { createInitialState } from './createInitialState'
 import { reducer, currentStep } from './reducer'
-import type { GameState } from './types'
+import type { GameState, GameEvent } from './types'
 
 function start(): GameState { return createInitialState(loadScenario()) }
 
