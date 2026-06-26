@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGameStore } from '../../store/gameStore'
 import { currentStep } from '../../engine/reducer'
@@ -19,13 +19,21 @@ export default function PlayScreen() {
     ? state.scenario.locations.find((l) => l.id === step.locationId) ?? null
     : null
 
+  const prevInsideRef = useRef(false)
+
+  // Reset "was inside" state whenever the target location changes (new step).
+  useEffect(() => { prevInsideRef.current = false }, [location?.id])
+
   // Auto arrive/leave from GPS.
   useEffect(() => {
     if (!location || !pos) return
-    if (isInside(location.geo, pos) && state.atLocationId !== location.id)
+    const inside = isInside(location.geo, pos)
+    if (inside && state.atLocationId !== location.id) {
       dispatch({ type: 'ARRIVE', locationId: location.id }, Date.now())
-    else if (!isInside(location.geo, pos) && state.atLocationId === location.id)
+    } else if (!inside && prevInsideRef.current && state.atLocationId === location.id) {
       dispatch({ type: 'LEAVE' }, Date.now())
+    }
+    prevInsideRef.current = inside
   }, [pos, location, dispatch, state.atLocationId])
 
   useEffect(() => {
