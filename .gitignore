@@ -1,6 +1,6 @@
 # Internal planning artifacts — keep out of the public repo
 docs/superpowers/
-docs/Adventure Engine Vision Document.pdf
+docs/*.pdf
 .superpowers/
 
 # Node / build
