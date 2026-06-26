@@ -9,7 +9,7 @@ export interface Location {
 
 export type StepEvent =
   | { type: 'dialog'; speaker: string; text: string }
-  | { type: 'riddle'; speaker?: string; question: string; answer: string; mapDigit?: string }
+  | { type: 'riddle'; speaker?: string; question: string; answer: string }
   | { type: 'use_item'; item: string; text: string }
   | { type: 'craft'; recipeId: string; text: string }
   | { type: 'finale_lock'; text: string }
@@ -19,6 +19,7 @@ export interface Step {
   locationId?: string        // absent => no physical location (e.g. craft in inventory)
   requires?: string[]        // item ids that must be in inventory to complete
   reward?: string[]          // item ids granted on completion
+  mapDigit?: string          // a digit revealed on completion (a map-piece step); appended to mapDigits
   arriveText?: string        // optional mini-event shown on (re)arrival
   event: StepEvent
 }

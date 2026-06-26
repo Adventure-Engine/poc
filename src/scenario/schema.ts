@@ -7,7 +7,7 @@ const location = z.object({ id: z.string().min(1), title: z.string().min(1), geo
 
 const stepEvent = z.discriminatedUnion('type', [
   z.object({ type: z.literal('dialog'), speaker: z.string(), text: z.string() }),
-  z.object({ type: z.literal('riddle'), speaker: z.string().optional(), question: z.string(), answer: z.string(), mapDigit: z.string().optional() }),
+  z.object({ type: z.literal('riddle'), speaker: z.string().optional(), question: z.string(), answer: z.string() }),
   z.object({ type: z.literal('use_item'), item: z.string(), text: z.string() }),
   z.object({ type: z.literal('craft'), recipeId: z.string(), text: z.string() }),
   z.object({ type: z.literal('finale_lock'), text: z.string() }),
@@ -18,6 +18,7 @@ const step = z.object({
   locationId: z.string().optional(),
   requires: z.array(z.string()).optional(),
   reward: z.array(z.string()).optional(),
+  mapDigit: z.string().optional(),
   arriveText: z.string().optional(),
   event: stepEvent,
 })

@@ -8,7 +8,7 @@ test('pirate scenario loads and validates', () => {
 test('finaleCode equals the in-order map digits', () => {
   const s = loadScenario()
   const digits = s.steps
-    .map((st) => (st.event.type === 'riddle' ? st.event.mapDigit : undefined))
+    .map((st) => st.mapDigit)
     .filter((d): d is string => Boolean(d))
     .join('')
   expect(digits).toBe(s.finaleCode)
