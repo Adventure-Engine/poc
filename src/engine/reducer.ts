@@ -40,6 +40,12 @@ export function reducer(state: GameState, event: GameEvent): GameState {
   if (event.type === 'ARRIVE') return { ...state, atLocationId: event.locationId }
   if (event.type === 'LEAVE') return { ...state, atLocationId: null }
 
+  // Collection is independent of the active step
+  if (event.type === 'COLLECT_DUBLON') {
+    if (state.collectedDublons.includes(event.dublonId)) return state
+    return { ...state, collectedDublons: [...state.collectedDublons, event.dublonId] }
+  }
+
   const step = currentStep(state)
   if (!step || state.finished) return state
   if (!atRequiredLocation(state, step) || !hasAll(state.inventory, step.requires)) return state
@@ -53,6 +59,30 @@ export function reducer(state: GameState, event: GameEvent): GameState {
       if (step.event.type !== 'riddle') return state
       if (normalize(event.value) !== normalize(step.event.answer)) return state
       return completeStep(state, step, 'Верно!')
+    }
+
+    case 'USE_ITEM': {
+      if (step.event.type !== 'use_item') return state
+      if (event.itemId !== step.event.item) return state
+      if (!state.inventory.includes(event.itemId)) return state
+      return completeStep(state, step, step.event.text)
+    }
+
+    case 'CRAFT': {
+      if (step.event.type !== 'craft') return state
+      if (event.recipeId !== step.event.recipeId) return state
+      const recipe = state.scenario.recipes.find((r) => r.id === event.recipeId)
+      if (!recipe || !hasAll(state.inventory, recipe.inputs)) return state
+      const consumed = state.inventory.filter((i) => !recipe.inputs.includes(i))
+      const next = completeStep(state, step, step.event.text)
+      return { ...next, inventory: [...consumed, recipe.output] }
+    }
+
+    case 'SUBMIT_CODE': {
+      if (step.event.type !== 'finale_lock') return state
+      if (normalize(event.value) !== normalize(state.scenario.finaleCode)) return state
+      const next = completeStep(state, step, 'Замок открыт! Сокровище найдено!')
+      return { ...next, finished: true }
     }
 
     default:
