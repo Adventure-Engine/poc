@@ -60,8 +60,10 @@ test('shows "Продолжить" when loadProgress returns an in-progress save
   const resumeBtn = await screen.findByRole('button', { name: /Продолжить/ })
   const user = userEvent.setup()
   await user.click(resumeBtn)
-  expect(mockHydrate).toHaveBeenCalledOnce()
-  expect(mockNavigate).toHaveBeenCalledWith('/play')
+  await waitFor(() => {
+    expect(mockHydrate).toHaveBeenCalledOnce()
+    expect(mockNavigate).toHaveBeenCalledWith('/play')
+  })
 })
 
 test('"Продолжить" is NOT shown when loadProgress resolves to null', async () => {

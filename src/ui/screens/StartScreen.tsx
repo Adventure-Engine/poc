@@ -18,6 +18,10 @@ export default function StartScreen() {
       if (!cancelled && saved && !saved.finished && saved.currentStepIndex > 0) {
         setCanResume(true)
       }
+    }).catch(() => {
+      if (!cancelled) {
+        setCanResume(false)
+      }
     })
     return () => { cancelled = true }
   }, [])
@@ -28,8 +32,8 @@ export default function StartScreen() {
     navigate('/play')
   }
 
-  const resume = () => {
-    void hydrate()
+  const resume = async () => {
+    await hydrate()
     navigate('/play')
   }
 
