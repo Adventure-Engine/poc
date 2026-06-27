@@ -1,6 +1,5 @@
 import 'fake-indexeddb/auto'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import { HashRouter } from 'react-router-dom'
 import PlayScreen from './PlayScreen'
 import { useGameStore } from '../../store/gameStore'
@@ -13,26 +12,28 @@ vi.mock('../../geo/useGeolocation', () => ({
 
 beforeEach(() => useGameStore.getState().reset())
 
-test('manual "Я на месте" arrival sticks when GPS is persistently outside the geofence', async () => {
+test('manual "Я на месте" arrival sticks when GPS is persistently outside the geofence', () => {
+  vi.useFakeTimers()
   // Advance to s_oak (first located step) so the navigation UI appears.
   useGameStore.getState().dispatch({ type: 'ADVANCE_DIALOG' }, 1)
 
   render(<HashRouter><PlayScreen /></HashRouter>)
 
-  // The navigation section should be visible before clicking.
+  // The fallback button is gated for 60s; elapse it.
+  act(() => { vi.advanceTimersByTime(60000) })
   expect(screen.getByRole('button', { name: /Я на месте/ })).toBeInTheDocument()
 
   // Click the fallback arrival button.
-  await userEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
+  fireEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
 
-  // The riddle should now be visible.
+  // The riddle should now be visible (the geo effect re-ran on arrival).
   expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
 
-  // Wait a tick to verify the auto-LEAVE does NOT fire and revert the arrival.
-  await waitFor(() => {
-    expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
-  })
+  // Elapse more time to confirm auto-LEAVE does NOT fire and revert the arrival.
+  act(() => { vi.advanceTimersByTime(5000) })
+  expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
 
   // Confirm the navigation button is gone (arrival stuck).
   expect(screen.queryByRole('button', { name: /Я на месте/ })).not.toBeInTheDocument()
+  vi.useRealTimers()
 })

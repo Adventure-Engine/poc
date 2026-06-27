@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HashRouter } from 'react-router-dom'
 import PlayScreen from './PlayScreen'
@@ -16,11 +16,25 @@ test('intro dialog renders and advances on tap', async () => {
 })
 
 test('"Я на месте" fallback marks arrival and shows the riddle', async () => {
+  vi.useFakeTimers()
   const store = useGameStore.getState()
   store.dispatch({ type: 'ADVANCE_DIALOG' }, 1) // move to s_oak
   render(<HashRouter><PlayScreen /></HashRouter>)
-  await userEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
+  await act(async () => { await vi.advanceTimersByTimeAsync(60000) }) // fallback gate elapses
+  fireEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
   expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
+  vi.useRealTimers()
+})
+
+test('"Я на месте" fallback is hidden until the delay elapses', () => {
+  vi.useFakeTimers()
+  const store = useGameStore.getState()
+  store.dispatch({ type: 'ADVANCE_DIALOG' }, 1) // move to s_oak (located step)
+  render(<HashRouter><PlayScreen /></HashRouter>)
+  expect(screen.queryByRole('button', { name: /Я на месте/ })).toBeNull()
+  act(() => { vi.advanceTimersByTime(60000) })
+  expect(screen.getByRole('button', { name: /Я на месте/ })).toBeInTheDocument()
+  vi.useRealTimers()
 })
 
 test('dublon hint button appears at loc_old_oak and collects dub_oak', async () => {
@@ -37,13 +51,16 @@ test('dublon hint button appears at loc_old_oak and collects dub_oak', async () 
 })
 
 test('fallback_used telemetry is logged when "Я на месте" button is pressed', async () => {
+  vi.useFakeTimers()
   const store = useGameStore.getState()
   store.dispatch({ type: 'ADVANCE_DIALOG' }, 1) // move to s_oak at loc_old_oak
   clearLog()
   render(<HashRouter><PlayScreen /></HashRouter>)
-  await userEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
+  await act(async () => { await vi.advanceTimersByTimeAsync(60000) })
+  fireEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
   const log = getLog()
   const fallbackEvent = log.find(e => e.name === 'fallback_used')
   expect(fallbackEvent).toBeDefined()
   expect(fallbackEvent?.data?.locationId).toBe('loc_old_oak')
+  vi.useRealTimers()
 })

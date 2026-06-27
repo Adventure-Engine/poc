@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGameStore } from '../../store/gameStore'
 import { currentStep } from '../../engine/reducer'
@@ -7,6 +7,11 @@ import { isInside, proximityHint } from '../../geo/geofence'
 import { logEvent } from '../../telemetry/log'
 import EventPanel from './EventPanel'
 import Inventory from '../components/Inventory'
+
+// The manual "Я на месте" fallback appears only after this many seconds at a
+// point, so a player has to spend time walking there rather than skipping
+// instantly. Real GPS arrival still fires immediately, regardless of this.
+const FALLBACK_DELAY_SEC = 60
 
 export default function PlayScreen() {
   const navigate = useNavigate()
@@ -23,6 +28,15 @@ export default function PlayScreen() {
 
   // Reset "was inside" state whenever the target location changes (new step).
   useEffect(() => { prevInsideRef.current = false }, [location?.id])
+
+  // Gate the manual "Я на месте" fallback: it only appears after the delay, so
+  // a player can't skip a point instantly. Resets on each new step.
+  const [fallbackReady, setFallbackReady] = useState(false)
+  useEffect(() => {
+    setFallbackReady(false)
+    const id = setTimeout(() => setFallbackReady(true), FALLBACK_DELAY_SEC * 1000)
+    return () => clearTimeout(id)
+  }, [step?.id])
 
   // Auto arrive/leave from GPS.
   useEffect(() => {
@@ -58,13 +72,17 @@ export default function PlayScreen() {
         <section className="panel">
           <p className="nav-target">Иди к точке: {location.title}</p>
           <p className={`proximity proximity--${proximityClass}`}>{hint === 'hot' ? 'Горячо!' : hint === 'warm' ? 'Теплее...' : 'Холодно'}</p>
-          <button className="btn" onClick={() => {
-            const at = Date.now()
-            logEvent('fallback_used', at, { locationId: location.id })
-            dispatch({ type: 'ARRIVE', locationId: location.id }, at)
-          }}>
-            Я на месте
-          </button>
+          {fallbackReady ? (
+            <button className="btn" onClick={() => {
+              const at = Date.now()
+              logEvent('fallback_used', at, { locationId: location.id })
+              dispatch({ type: 'ARRIVE', locationId: location.id }, at)
+            }}>
+              Я на месте
+            </button>
+          ) : (
+            <p className="screen-sub">Иди к точке — следи за подсказкой «Горячо / Холодно». Если не получится дойти, скоро появится кнопка.</p>
+          )}
         </section>
       )}
       {atTarget && <EventPanel key={step.id} step={step} />}
