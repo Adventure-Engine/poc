@@ -66,7 +66,7 @@ export default function PlayScreen() {
           </button>
         </section>
       )}
-      {atTarget && <EventPanel step={step} />}
+      {atTarget && <EventPanel key={step.id} step={step} />}
       {uncollectedDublon && (
         <section style={{ marginTop: 12 }}>
           <p>{uncollectedDublon.hint}</p>
