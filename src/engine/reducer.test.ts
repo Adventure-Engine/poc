@@ -14,14 +14,14 @@ test('first step is the intro dialog and advances on ADVANCE_DIALOG', () => {
 
 test('riddle does not complete from the wrong location', () => {
   let s = reducer(start(), { type: 'ADVANCE_DIALOG' }) // now at s_oak (needs loc_old_oak)
-  s = reducer(s, { type: 'SUBMIT_ANSWER', value: '4' })
+  s = reducer(s, { type: 'SUBMIT_ANSWER', value: '7' })
   expect(currentStep(s)?.id).toBe('s_oak') // unchanged, not arrived
 })
 
 test('riddle completes at the right location, grants reward and map digit', () => {
   let s = reducer(start(), { type: 'ADVANCE_DIALOG' })
   s = reducer(s, { type: 'ARRIVE', locationId: 'loc_old_oak' })
-  s = reducer(s, { type: 'SUBMIT_ANSWER', value: '  4 ' })
+  s = reducer(s, { type: 'SUBMIT_ANSWER', value: '  7 ' })
   expect(s.inventory).toContain('map_piece_1')
   expect(s.mapDigits).toEqual(['7'])
   expect(currentStep(s)?.id).toBe('s_stones')
@@ -39,7 +39,7 @@ function driveTo(stepId: string): GameState {
   let s = start()
   const order: GameEvent[] = [
     { type: 'ADVANCE_DIALOG' },                                   // s_start -> s_oak
-    { type: 'ARRIVE', locationId: 'loc_old_oak' }, { type: 'SUBMIT_ANSWER', value: '4' },
+    { type: 'ARRIVE', locationId: 'loc_old_oak' }, { type: 'SUBMIT_ANSWER', value: '7' },
     { type: 'ARRIVE', locationId: 'loc_three_stones' }, { type: 'SUBMIT_ANSWER', value: '3' },
     { type: 'ARRIVE', locationId: 'loc_well' }, { type: 'SUBMIT_ANSWER', value: '7' },
     { type: 'ARRIVE', locationId: 'loc_three_stones' }, { type: 'USE_ITEM', itemId: 'rusty_key' },

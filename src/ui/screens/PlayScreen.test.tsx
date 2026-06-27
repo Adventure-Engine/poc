@@ -20,7 +20,7 @@ test('"Я на месте" fallback marks arrival and shows the riddle', async (
   store.dispatch({ type: 'ADVANCE_DIALOG' }, 1) // move to s_oak
   render(<HashRouter><PlayScreen /></HashRouter>)
   await userEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
-  expect(screen.getByText(/Сколько больших ветвей/)).toBeInTheDocument()
+  expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
 })
 
 test('dublon hint button appears at loc_old_oak and collects dub_oak', async () => {

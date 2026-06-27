@@ -26,11 +26,11 @@ test('manual "Я на месте" arrival sticks when GPS is persistently outsid
   await userEvent.click(screen.getByRole('button', { name: /Я на месте/ }))
 
   // The riddle should now be visible.
-  expect(screen.getByText(/Сколько больших ветвей/)).toBeInTheDocument()
+  expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
 
   // Wait a tick to verify the auto-LEAVE does NOT fire and revert the arrival.
   await waitFor(() => {
-    expect(screen.getByText(/Сколько больших ветвей/)).toBeInTheDocument()
+    expect(screen.getByText(/сколько дней в неделе/i)).toBeInTheDocument()
   })
 
   // Confirm the navigation button is gone (arrival stuck).

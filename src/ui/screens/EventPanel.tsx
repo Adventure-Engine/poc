@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { Step } from '../../scenario/types'
 import { useGameStore } from '../../store/gameStore'
+import { normalizeAnswer } from '../../engine/reducer'
+import { logEvent } from '../../telemetry/log'
 
 export default function EventPanel({ step }: { step: Step }) {
   const dispatch = useGameStore((s) => s.dispatch)
@@ -8,6 +10,9 @@ export default function EventPanel({ step }: { step: Step }) {
   const mapDigits = useGameStore((s) => s.mapDigits)
   const finaleCodeLength = useGameStore((s) => s.scenario.finaleCode.length)
   const [answer, setAnswer] = useState('')
+  const [wrong, setWrong] = useState(0)
+  const [showHint, setShowHint] = useState(false)
+  const [revealed, setRevealed] = useState(false)
 
   const e = step.event
   if (e.type === 'dialog') {
@@ -22,10 +27,46 @@ export default function EventPanel({ step }: { step: Step }) {
     return (
       <section>
         <p>{e.question}</p>
-        <input aria-label="Ответ" value={answer} onChange={(ev) => setAnswer(ev.target.value)} />
-        <button onClick={() => { dispatch({ type: 'SUBMIT_ANSWER', value: answer }, Date.now()); setAnswer('') }}>
+        <input
+          aria-label="Ответ"
+          value={answer}
+          onChange={(ev) => setAnswer(ev.target.value)}
+        />
+        {wrong > 0 && <p>Мимо! Попробуй ещё.</p>}
+        <button
+          onClick={() => {
+            if (normalizeAnswer(answer) === normalizeAnswer(e.answer)) {
+              dispatch({ type: 'SUBMIT_ANSWER', value: answer }, Date.now())
+            } else {
+              setWrong((w) => w + 1)
+              setAnswer('')
+            }
+          }}
+        >
           Ответить
         </button>
+        {e.hint && !showHint && (
+          <button
+            onClick={() => {
+              setShowHint(true)
+              logEvent('hint_used', Date.now(), { stepId: step.id })
+            }}
+          >
+            Подсказка
+          </button>
+        )}
+        {showHint && <p>{e.hint}</p>}
+        {wrong >= 2 && !revealed && (
+          <button
+            onClick={() => {
+              setAnswer(e.answer)
+              setRevealed(true)
+              logEvent('answer_revealed', Date.now(), { stepId: step.id })
+            }}
+          >
+            Показать ответ
+          </button>
+        )}
       </section>
     )
   }

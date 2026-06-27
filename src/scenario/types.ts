@@ -9,7 +9,7 @@ export interface Location {
 
 export type StepEvent =
   | { type: 'dialog'; speaker: string; text: string }
-  | { type: 'riddle'; speaker?: string; question: string; answer: string }
+  | { type: 'riddle'; speaker?: string; question: string; answer: string; hint?: string }
   | { type: 'use_item'; item: string; text: string }
   | { type: 'craft'; recipeId: string; text: string }
   | { type: 'finale_lock'; text: string }

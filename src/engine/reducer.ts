@@ -21,7 +21,7 @@ export function canCompleteCurrent(state: GameState): boolean {
   return atRequiredLocation(state, step) && hasAll(state.inventory, step.requires)
 }
 
-function normalize(value: string): string {
+export function normalizeAnswer(value: string): string {
   return value.trim().toLowerCase()
 }
 
@@ -57,7 +57,7 @@ export function reducer(state: GameState, event: GameEvent): GameState {
 
     case 'SUBMIT_ANSWER': {
       if (step.event.type !== 'riddle') return state
-      if (normalize(event.value) !== normalize(step.event.answer)) return state
+      if (normalizeAnswer(event.value) !== normalizeAnswer(step.event.answer)) return state
       return completeStep(state, step, 'Верно!')
     }
 
@@ -80,7 +80,7 @@ export function reducer(state: GameState, event: GameEvent): GameState {
 
     case 'SUBMIT_CODE': {
       if (step.event.type !== 'finale_lock') return state
-      if (normalize(event.value) !== normalize(state.scenario.finaleCode)) return state
+      if (normalizeAnswer(event.value) !== normalizeAnswer(state.scenario.finaleCode)) return state
       const next = completeStep(state, step, 'Замок открыт! Сокровище найдено!')
       return { ...next, finished: true }
     }
