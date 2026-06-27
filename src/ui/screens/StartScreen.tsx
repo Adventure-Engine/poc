@@ -38,11 +38,14 @@ export default function StartScreen() {
   }
 
   return (
-    <main style={{ padding: 24, textAlign: 'center' }}>
-      <h1>{title}</h1>
-      <p>Outdoor escape room. Возьми телефон и найди клад капитана Моргана!</p>
-      <button onClick={startNew}>Начать приключение</button>
-      {canResume && <button onClick={resume}>Продолжить</button>}
+    <main className="screen screen--center">
+      <div className="crest">☠️ ⚓ ☠️</div>
+      <h1 className="screen-title">{title}</h1>
+      <p className="screen-sub">Outdoor escape room. Возьми телефон и найди клад капитана Моргана!</p>
+      <div className="btn-row">
+        <button className="btn btn--gold" onClick={startNew}>Начать приключение</button>
+        {canResume && <button className="btn btn--ghost" onClick={resume}>Продолжить</button>}
+      </div>
     </main>
   )
 }

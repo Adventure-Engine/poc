@@ -17,23 +17,25 @@ export default function EventPanel({ step }: { step: Step }) {
   const e = step.event
   if (e.type === 'dialog') {
     return (
-      <section>
-        <p><b>{e.speaker}:</b> {e.text}</p>
-        <button onClick={() => dispatch({ type: 'ADVANCE_DIALOG' }, Date.now())}>Дальше</button>
+      <section className="card">
+        <p><span className="speaker">{e.speaker}:</span> <span className="dialog-text">{e.text}</span></p>
+        <button className="btn" onClick={() => dispatch({ type: 'ADVANCE_DIALOG' }, Date.now())}>Дальше</button>
       </section>
     )
   }
   if (e.type === 'riddle') {
     return (
-      <section>
-        <p>{e.question}</p>
+      <section className="card">
+        <p className="riddle-question">{e.question}</p>
         <input
+          className="input"
           aria-label="Ответ"
           value={answer}
           onChange={(ev) => setAnswer(ev.target.value)}
         />
-        {wrong > 0 && <p>Мимо! Попробуй ещё.</p>}
+        {wrong > 0 && <p className="feedback">Мимо! Попробуй ещё.</p>}
         <button
+          className="btn"
           onClick={() => {
             if (normalizeAnswer(answer) === normalizeAnswer(e.answer)) {
               dispatch({ type: 'SUBMIT_ANSWER', value: answer }, Date.now())
@@ -47,6 +49,7 @@ export default function EventPanel({ step }: { step: Step }) {
         </button>
         {e.hint && !showHint && (
           <button
+            className="btn btn--ghost"
             onClick={() => {
               setShowHint(true)
               logEvent('hint_used', Date.now(), { stepId: step.id })
@@ -55,9 +58,10 @@ export default function EventPanel({ step }: { step: Step }) {
             Подсказка
           </button>
         )}
-        {showHint && <p>{e.hint}</p>}
+        {showHint && <p className="hint">{e.hint}</p>}
         {wrong >= 2 && !revealed && (
           <button
+            className="btn btn--ghost"
             onClick={() => {
               setAnswer(e.answer)
               setRevealed(true)
@@ -73,9 +77,9 @@ export default function EventPanel({ step }: { step: Step }) {
   if (e.type === 'use_item') {
     const has = inventory.includes(e.item)
     return (
-      <section>
+      <section className="card">
         <p>{step.arriveText}</p>
-        <button disabled={!has} onClick={() => dispatch({ type: 'USE_ITEM', itemId: e.item }, Date.now())}>
+        <button className="btn" disabled={!has} onClick={() => dispatch({ type: 'USE_ITEM', itemId: e.item }, Date.now())}>
           Использовать предмет
         </button>
       </section>
@@ -83,19 +87,24 @@ export default function EventPanel({ step }: { step: Step }) {
   }
   if (e.type === 'craft') {
     return (
-      <section>
+      <section className="card">
         <p>{e.text}</p>
-        <button onClick={() => dispatch({ type: 'CRAFT', recipeId: e.recipeId }, Date.now())}>Соединить</button>
+        <button className="btn" onClick={() => dispatch({ type: 'CRAFT', recipeId: e.recipeId }, Date.now())}>Соединить</button>
       </section>
     )
   }
   // finale_lock
   return (
-    <section>
+    <section className="card">
       <p>{e.text}</p>
-      <p aria-label="Карта">Цифры с собранной карты: {mapDigits.length ? mapDigits.join(' ') : '— — —'}</p>
-      <input aria-label="Код" maxLength={finaleCodeLength} value={answer} onChange={(ev) => setAnswer(ev.target.value)} />
-      <button onClick={() => dispatch({ type: 'SUBMIT_CODE', value: answer }, Date.now())}>Открыть замок</button>
+      <p aria-label="Карта">Цифры с собранной карты:</p>
+      <div className="map-digits">
+        {Array.from({ length: finaleCodeLength }, (_, i) => (
+          <span key={i} className={`digit${mapDigits[i] ? '' : ' digit--empty'}`}>{mapDigits[i] ?? '?'}</span>
+        ))}
+      </div>
+      <input className="input input--code" aria-label="Код" maxLength={finaleCodeLength} value={answer} onChange={(ev) => setAnswer(ev.target.value)} />
+      <button className="btn btn--gold" onClick={() => dispatch({ type: 'SUBMIT_CODE', value: answer }, Date.now())}>Открыть замок</button>
     </section>
   )
 }

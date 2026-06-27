@@ -45,68 +45,67 @@ export default function AuthorScreen() {
           ...st.event,
           question: edit.question,
           answer: edit.answer,
-          ...(edit.hint ? { hint: edit.hint } : {}),
+          hint: edit.hint || undefined,
         },
       }
     }),
   }
 
   return (
-    <main style={{ padding: 24 }}>
-      <h2>Режим автора — запись GPS</h2>
-      <p>Точность: {accuracy ? `${Math.round(accuracy)} м` : '—'} | Координаты:{' '}
-        {pos ? `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}` : '—'}</p>
-      <label>
-        Точка:{' '}
-        <select value={selected} onChange={(e) => setSelected(e.target.value)}>
-          {scenario.locations.map((l) => <option key={l.id} value={l.id}>{l.id} — {l.title}</option>)}
-        </select>
-      </label>{' '}
-      <button onClick={capture} disabled={!pos}>Записать точку</button>
+    <main className="screen">
+      <h2 className="screen-title">Режим автора — запись GPS</h2>
+      <section className="panel">
+        <p>Точность: {accuracy ? `${Math.round(accuracy)} м` : '—'} | Координаты:{' '}
+          {pos ? `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}` : '—'}</p>
+        <div className="author-field">
+          <label>Точка</label>
+          <select className="input" value={selected} onChange={(e) => setSelected(e.target.value)}>
+            {scenario.locations.map((l) => <option key={l.id} value={l.id}>{l.id} — {l.title}</option>)}
+          </select>
+        </div>
+        <button className="btn" onClick={capture} disabled={!pos}>Записать точку</button>
 
-      <h3>Загадки</h3>
-      {riddleSteps.map((st) => {
-        const locTitle = st.locationId ? (locById[st.locationId]?.title ?? st.locationId) : st.id
-        const edit = riddleEdits[st.id] ?? { question: '', answer: '', hint: '' }
-        return (
-          <div key={st.id}>
-            <b>{locTitle} ({st.id})</b>
-            <div>
-              <label>
-                Вопрос:{' '}
+        <h3>Загадки</h3>
+        {riddleSteps.map((st) => {
+          const locTitle = st.locationId ? (locById[st.locationId]?.title ?? st.locationId) : st.id
+          const edit = riddleEdits[st.id] ?? { question: '', answer: '', hint: '' }
+          return (
+            <div key={st.id}>
+              <b>{locTitle} ({st.id})</b>
+              <div className="author-field">
+                <label>Вопрос</label>
                 <input
+                  className="input"
                   aria-label={`Вопрос: ${st.id}`}
                   value={edit.question}
                   onChange={(e) => setRiddleField(st.id, 'question', e.target.value)}
                 />
-              </label>
-            </div>
-            <div>
-              <label>
-                Ответ:{' '}
+              </div>
+              <div className="author-field">
+                <label>Ответ</label>
                 <input
+                  className="input"
                   aria-label={`Ответ: ${st.id}`}
                   value={edit.answer}
                   onChange={(e) => setRiddleField(st.id, 'answer', e.target.value)}
                 />
-              </label>
-            </div>
-            <div>
-              <label>
-                Подсказка:{' '}
+              </div>
+              <div className="author-field">
+                <label>Подсказка</label>
                 <input
+                  className="input"
                   aria-label={`Подсказка: ${st.id}`}
                   value={edit.hint}
                   onChange={(e) => setRiddleField(st.id, 'hint', e.target.value)}
                 />
-              </label>
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </section>
 
       <h3>JSON-предпросмотр для pirates.json</h3>
-      <pre>{JSON.stringify(preview, null, 2)}</pre>
+      <pre className="export">{JSON.stringify(preview, null, 2)}</pre>
     </main>
   )
 }

@@ -17,14 +17,15 @@ export default function FinaleScreen() {
   }
 
   return (
-    <main style={{ padding: 24, textAlign: 'center' }}>
-      <h1>Сокровище найдено! 🏴‍☠️</h1>
+    <main className="screen screen--center">
+      <div className="finale-emoji">🏴‍☠️ 💰</div>
+      <h1 className="screen-title">Сокровище найдено! 🏴‍☠️</h1>
       <p>Капитан Морган принимает тебя в команду, юнга!</p>
-      {allDublons && <p>Ты собрал ВСЕ дублоны — секрет открыт!</p>}
+      {allDublons && <p className="secret">Ты собрал ВСЕ дублоны — секрет открыт!</p>}
       <CollectionBar />
-      <div style={{ marginTop: 16 }}>
-        <button onClick={download}>Скачать метрики</button>{' '}
-        <button onClick={() => { reset(); navigate('/') }}>Заново</button>
+      <div className="btn-row">
+        <button className="btn btn--ghost" onClick={download}>Скачать метрики</button>
+        <button className="btn btn--gold" onClick={() => { reset(); navigate('/') }}>Заново</button>
       </div>
     </main>
   )

@@ -7,6 +7,6 @@ test('renders held items', () => {
   useGameStore.getState().reset()
   useGameStore.setState({ inventory: ['rusty_key', 'rope'] })
   render(<Inventory />)
-  expect(screen.getByText(/rusty_key/)).toBeInTheDocument()
-  expect(screen.getByText(/rope/)).toBeInTheDocument()
+  expect(screen.getByText(/Ржавый ключ/)).toBeInTheDocument()
+  expect(screen.getByText(/Верёвка/)).toBeInTheDocument()
 })

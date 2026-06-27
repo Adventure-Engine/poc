@@ -40,10 +40,11 @@ export default function PlayScreen() {
     if (state.finished) navigate('/finale')
   }, [state.finished, navigate])
 
-  if (!step) return <main style={{ padding: 24 }}><h2>Конец</h2></main>
+  if (!step) return <main className="screen"><h2>Конец</h2></main>
 
   const atTarget = !location || state.atLocationId === location.id
   const hint = location && pos ? proximityHint(location.geo, pos) : 'cold'
+  const proximityClass = hint === 'inside' ? 'hot' : hint
 
   const uncollectedDublon = atTarget && location
     ? state.scenario.dublons.find(
@@ -52,12 +53,12 @@ export default function PlayScreen() {
     : null
 
   return (
-    <main style={{ padding: 24 }}>
+    <main className="screen">
       {location && !atTarget && (
-        <section>
-          <h2>Иди к точке: {location.title}</h2>
-          <p>{hint === 'hot' ? 'Горячо!' : hint === 'warm' ? 'Теплее...' : 'Холодно'}</p>
-          <button onClick={() => {
+        <section className="panel">
+          <p className="nav-target">Иди к точке: {location.title}</p>
+          <p className={`proximity proximity--${proximityClass}`}>{hint === 'hot' ? 'Горячо!' : hint === 'warm' ? 'Теплее...' : 'Холодно'}</p>
+          <button className="btn" onClick={() => {
             const at = Date.now()
             logEvent('fallback_used', at, { locationId: location.id })
             dispatch({ type: 'ARRIVE', locationId: location.id }, at)
@@ -68,9 +69,9 @@ export default function PlayScreen() {
       )}
       {atTarget && <EventPanel key={step.id} step={step} />}
       {uncollectedDublon && (
-        <section style={{ marginTop: 12 }}>
+        <section className="panel" style={{ marginTop: 12 }}>
           <p>{uncollectedDublon.hint}</p>
-          <button onClick={() => dispatch({ type: 'COLLECT_DUBLON', dublonId: uncollectedDublon.id }, Date.now())}>
+          <button className="btn" onClick={() => dispatch({ type: 'COLLECT_DUBLON', dublonId: uncollectedDublon.id }, Date.now())}>
             Я нашёл дублон! 🪙
           </button>
         </section>
