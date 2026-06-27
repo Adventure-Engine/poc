@@ -49,7 +49,7 @@ export default function EventPanel({ step }: { step: Step }) {
         </button>
         {e.hint && !showHint && (
           <button
-            className="btn btn--ghost"
+            className="btn btn--ink"
             onClick={() => {
               setShowHint(true)
               logEvent('hint_used', Date.now(), { stepId: step.id })
@@ -61,7 +61,7 @@ export default function EventPanel({ step }: { step: Step }) {
         {showHint && <p className="hint">{e.hint}</p>}
         {wrong >= 2 && !revealed && (
           <button
-            className="btn btn--ghost"
+            className="btn btn--ink"
             onClick={() => {
               setAnswer(e.answer)
               setRevealed(true)
